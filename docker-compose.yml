@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: rugbydb
+      POSTGRES_PASSWORD: rugby
+      POSTGRES_DB: rugby_donations
+    ports:
+      - "5433:5432"
+    volumes:
+      - rugby_pg:/var/lib/postgresql/data
+    profiles: ["localdb"]
+
+  api:
+    build: ./backend
+    env_file: .env
+    environment:
+      FRONTEND_URL: http://localhost:3000
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8000:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:8080"
+    depends_on:
+      - api
+
+volumes:
+  rugby_pg:

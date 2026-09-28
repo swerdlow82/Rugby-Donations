@@ -1,0 +1,22 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/oregon-rugby-api", "./backend"]
+  - name: gcr.io/cloud-builders/docker
+    args:
+      [
+        "build",
+        "-t",
+        "gcr.io/$PROJECT_ID/oregon-rugby-web",
+        "--build-arg",
+        "NEXT_PUBLIC_API_URL=${_API_URL}",
+        "./frontend",
+      ]
+  - name: gcr.io/cloud-builders/docker
+    args: ["push", "gcr.io/$PROJECT_ID/oregon-rugby-api"]
+  - name: gcr.io/cloud-builders/docker
+    args: ["push", "gcr.io/$PROJECT_ID/oregon-rugby-web"]
+substitutions:
+  _API_URL: https://api.example.com
+images:
+  - gcr.io/$PROJECT_ID/oregon-rugby-api
+  - gcr.io/$PROJECT_ID/oregon-rugby-web
